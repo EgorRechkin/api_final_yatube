@@ -85,6 +85,7 @@ class TestFollowAPI:
             'автора, но которого подписан пользователь.'
         )
 
+    @pytest.mark.usefixtures
     def test_follow_create(self, user_client, follow_2, follow_3, user,
                            user_2, another_user):
         follow_count = Follow.objects.count()
