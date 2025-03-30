@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied, ValidationError, NotFound
 from django.shortcuts import get_object_or_404
 from posts.models import Post, Comment, Follow, Group
-from .serializers import PostSerializer, CommentSerializer, FollowSerializer, GroupSerializer
+from .serializers import PostSerializer, CommentSerializer
 
 
 class PostViewSet(viewsets.ModelViewSet):
