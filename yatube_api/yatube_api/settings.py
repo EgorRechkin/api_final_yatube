@@ -17,6 +17,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework_simplejwt',
     'api',
     'posts',
 ]
@@ -52,7 +53,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'yatube_api.wsgi.application'
-
 
 DATABASES = {
     'default': {
