@@ -1,10 +1,12 @@
 from rest_framework import viewsets, permissions, status, filters
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
-from rest_framework.exceptions import PermissionDenied, ValidationError, NotFound
+from rest_framework.exceptions import (
+    PermissionDenied, ValidationError, NotFound)
 from django.shortcuts import get_object_or_404
 from posts.models import Post, Comment, Follow, Group
-from .serializers import PostSerializer, CommentSerializer, FollowSerializer, GroupSerializer
+from .serializers import (
+    PostSerializer, CommentSerializer, FollowSerializer, GroupSerializer)
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -18,7 +20,8 @@ class PostViewSet(viewsets.ModelViewSet):
 
     def check_author_permission(self, instance):
         if instance.author != self.request.user:
-            raise PermissionDenied("У вас недостаточно прав для выполнения данного действия.")
+            raise PermissionDenied(
+                "У вас недостаточно прав для выполнения данного действия.")
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -38,6 +41,7 @@ class PostViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
         return Response(serializer.data)
+
 
 class CommentViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
@@ -60,7 +64,8 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         comment = get_object_or_404(Comment, id=self.kwargs.get('pk'))
-        serializer = self.get_serializer(comment, data=request.data, partial=False)
+        serializer = self.get_serializer(
+            comment, data=request.data, partial=False)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
@@ -68,8 +73,10 @@ class CommentViewSet(viewsets.ModelViewSet):
     def partial_update(self, request, *args, **kwargs):
         instance = self.get_object()
         if instance.author != request.user:
-            raise PermissionDenied("У вас недостаточно прав для редактирования комментария.")
-        serializer = self.get_serializer(instance, data=request.data, partial=True)
+            raise PermissionDenied(
+                "У вас недостаточно прав для редактирования комментария.")
+        serializer = self.get_serializer(
+            instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
@@ -77,7 +84,8 @@ class CommentViewSet(viewsets.ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         if instance.author != request.user:
-            raise PermissionDenied("У вас недостаточно прав для выполнения данного действия.")
+            raise PermissionDenied(
+                "У вас недостаточно прав для выполнения данного действия.")
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -90,20 +98,24 @@ class FollowViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         if not self.request.user.is_authenticated:
-            raise NotFound("У вас недостаточно прав для выполнения данного действия.")
+            raise NotFound(
+                "У вас недостаточно прав для выполнения данного действия.")
         queryset = Follow.objects.filter(user=self.request.user)
         search_query = self.request.query_params.get('search')
         if search_query:
-            queryset = queryset.filter(following__username__icontains=search_query)
+            queryset = queryset.filter(
+                following__username__icontains=search_query)
         return queryset
 
     def perform_create(self, serializer):
         following_user = serializer.validated_data['following']
         if following_user == self.request.user:
             raise ValidationError("Нельзя подписаться на самого себя.")
-        if Follow.objects.filter(user=self.request.user, following=following_user).exists():
+        if Follow.objects.filter(user=self.request.user,
+                                 following=following_user).exists():
             raise ValidationError("Вы уже подписаны на этого пользователя.")
         serializer.save(user=self.request.user)
+
 
 class GroupViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
