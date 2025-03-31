@@ -25,3 +25,25 @@ class CommentSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ['author', 'post']
         model = Comment
+
+
+class FollowSerializer(serializers.ModelSerializer):
+    user = serializers.SlugRelatedField(
+        slug_field='username',
+        read_only=True
+    )
+    following = serializers.SlugRelatedField(
+        slug_field='username',
+        queryset=User.objects.all()
+    )
+
+    class Meta:
+        model = Follow
+        fields = ['id', 'user', 'following']
+        read_only_fields = ['user']
+
+
+class GroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = '__all__'
+        model = Group

@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied, ValidationError, NotFound
 from django.shortcuts import get_object_or_404
 from posts.models import Post, Comment, Follow, Group
-from .serializers import PostSerializer, CommentSerializer
+from .serializers import PostSerializer, CommentSerializer, FollowSerializer, GroupSerializer
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -81,3 +81,32 @@ class CommentViewSet(viewsets.ModelViewSet):
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+
+class FollowViewSet(viewsets.ModelViewSet):
+    serializer_class = FollowSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['following__username']
+
+    def get_queryset(self):
+        if not self.request.user.is_authenticated:
+            raise NotFound("У вас недостаточно прав для выполнения данного действия.")
+        queryset = Follow.objects.filter(user=self.request.user)
+        search_query = self.request.query_params.get('search')
+        if search_query:
+            queryset = queryset.filter(following__username__icontains=search_query)
+        return queryset
+
+    def perform_create(self, serializer):
+        following_user = serializer.validated_data['following']
+        if following_user == self.request.user:
+            raise ValidationError("Нельзя подписаться на самого себя.")
+        if Follow.objects.filter(user=self.request.user, following=following_user).exists():
+            raise ValidationError("Вы уже подписаны на этого пользователя.")
+        serializer.save(user=self.request.user)
+
+class GroupViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    serializer_class = GroupSerializer
+    queryset = Group.objects.all()
+    http_method_names = ['get', 'head', 'options']

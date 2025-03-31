@@ -7,9 +7,9 @@ REST API для социальной сети Yatube
 - JWT-аутентификация
 - Создание/редактирование постов
 - Комментирование постов
-- Подписки на авторов
+- Подписка на авторов
 - Группы постов (сообщества)
-- Пагинация и поиск
+- Пагинация
 
 ## Технологический стек
 
@@ -18,11 +18,9 @@ REST API для социальной сети Yatube
 - Django REST Framework 3.12
 - SQLite3
 
-Версии не должны отличаться на 2 уровне версионирования.
-
 ## Запуск проекта
 
-``git clone https://github.com/DenixSaw/api_final_yatube`` - клонирование репозитория
+``git clone https://github.com/DenixSaw/api_final_yatube`` - клонирование репозитория из github
 
 ``python3 -m venv .venv`` - создание виртуальной среды
 
@@ -32,6 +30,7 @@ REST API для социальной сети Yatube
 
 ``cd /yatube_api`` - переход в главную директорию проекта
 
-``python3 manage.py migrate`` - накатывание миграций
+``python3 manage.py migrate`` - совершение миграций
 
 ``python3 manage.py runserver <номер порта (опционально)>`` - запуск приложения (REST-API)
+
